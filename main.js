@@ -40,6 +40,10 @@ const renderer = new WebGLRenderer({ antialias: true })
 document.body.appendChild(renderer.domElement)
 
 const controls = new OrbitControls(camera, renderer.domElement)
+controls.enableRotate = false
+controls.enablePan = false
+controls.maxDistance = 10 + grid.resolution.height / 2
+controls.minDistance = grid.resolution.height / 3
 
 const cursor = new Vector2()
 const playerHandler = new Handler({ x: 0, y: grid.resolution.height / 2 - 10 })

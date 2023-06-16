@@ -127,9 +127,9 @@ export default class Ball extends Mesh {
 		const position2 = this.position.clone().add(v)
 
 		if (
-			virtualCollision.x <
+			Math.max(virtualCollision.x, collision.x) <
 				handler.position.x - (handler.length + 1 + this.radius) / 2 ||
-			virtualCollision.x >
+			Math.min(virtualCollision.x, collision.x) >
 				handler.position.x + (handler.length + 1 + this.radius) / 2 ||
 			Math.abs(position2.z) < Math.abs(collision.z) ||
 			Math.abs(this.position.z) > Math.abs(collision.z)
@@ -154,7 +154,7 @@ export default class Ball extends Mesh {
 			this.velocity.x += 20 * dfc
 		}
 
-		this.maxSpeed += 0.5
+		this.maxSpeed += 0.25
 
 		this.velocity.normalize().multiplyScalar(this.maxSpeed)
 		// }

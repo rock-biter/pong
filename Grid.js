@@ -34,6 +34,10 @@ class Grid extends Mesh {
 		this.material.opacity = 0
 
 		scene.add(leftSide, rightSide)
+		this.left = leftSide
+		this.right = rightSide
+
+		console.log(this.left)
 
 		Grid.el = this
 	}

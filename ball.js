@@ -1,4 +1,11 @@
-import { Mesh, MeshNormalMaterial, SphereGeometry, Vector3 } from 'three'
+import {
+	Mesh,
+	MeshNormalMaterial,
+	Plane,
+	Ray,
+	SphereGeometry,
+	Vector3,
+} from 'three'
 import scene from './Scene'
 import grid from './Grid'
 
@@ -12,11 +19,21 @@ export default class Ball extends Mesh {
 		this.radius = radius
 		this.position.y = this.radius
 
-		this.maxSpeed = 30
-
 		this.initVelocity()
 
 		this.scene.add(this)
+
+		const mesh = new Mesh(
+			new SphereGeometry(0.5, 10, 10),
+			new MeshNormalMaterial()
+		)
+
+		mesh.position.copy(this.position)
+
+		this.collisionMesh = mesh
+		this.collisionHandler = mesh.clone()
+
+		// scene.add(this.collisionMesh, this.collisionHandler)
 	}
 
 	get scene() {
@@ -24,71 +41,124 @@ export default class Ball extends Mesh {
 	}
 
 	update(dt, handlers) {
-		this.checkBoundaries(this.getNextPosition(dt), dt)
+		const nVel = this.velocity.clone().normalize()
+		const position = this.position.clone()
+		// const ray = new Ray(position, nVel)
 
 		const handler = handlers.find((h) => {
 			const hSide = Math.sign(h.position.z)
-			const bSide = Math.sign(this.position.z)
+			const bSide = Math.sign(position.z)
 			const vDir = Math.sign(this.velocity.z)
 
 			return hSide == bSide && vDir == hSide
 		})
 
-		if (handler) {
-			this.checkHandlerCollision(handler, dt)
+		const pointA = this.getWallCollisionPoint()
+		const pointB = this.getHandlerCollisionPoint()
+		const pointBReal = this.getHandlerCollisionPoint(true)
+
+		if (pointA.length() > pointB.length()) {
+			// console.log('collide first with handler')
+			if (handler) {
+				this.checkHandlerCollision(handler, dt, pointB, pointBReal)
+			}
+			this.checkBoundaries(this.getNextPosition(dt), dt)
+		} else {
+			// console.log('collide first with wall')
+			this.checkBoundaries(this.getNextPosition(dt), dt)
+
+			if (handler) {
+				this.checkHandlerCollision(handler, dt, pointB, pointBReal)
+			}
 		}
 
 		// this.position.add(this.velocity.clone().multiplyScalar(dt))
 	}
 
-	checkHandlerCollision(handler, dt) {
-		const v = this.velocity.clone().multiplyScalar(dt)
-		const diff =
-			Math.abs(handler.position.z) -
-			handler.depth / 2 -
-			this.radius -
-			Math.abs(this.position.z)
+	getHandlerCollisionPoint(real = false) {
+		const nVel = this.velocity.clone().normalize()
+		const position = this.position.clone()
+		const ray = new Ray(position, nVel)
+		const normal = Math.sign(this.velocity.z)
 
-		// console.log(diff)
+		const point = new Vector3()
 
-		if (diff <= 0 && Math.abs(diff) <= Math.abs(v.z)) {
-			const pct = diff / v.z
-			const hDirection = Math.sign(v.x)
+		const offset = real ? 0 : this.radius + 0.25
 
-			const collision = new Vector3()
-				.copy(this.position)
-				.sub(new Vector3(-hDirection * v.x * pct, 0, -diff))
+		ray.intersectPlane(
+			new Plane(
+				new Vector3(0, 0, normal),
+				-grid.resolution.height / 2 + 10 + offset
+			),
+			point
+		)
 
-			// console.log(collision, hDirection, v.x, pct)
-
-			// const mesh = new Mesh(
-			// 	new SphereGeometry(0.1, 5, 5),
-			// 	new MeshNormalMaterial()
-			// )
-			// scene.add(mesh)
-			// mesh.position.copy(collision)
-
-			if (
-				collision.x >
-					handler.position.x - (handler.length + 1 + this.radius) / 2 &&
-				collision.x <
-					handler.position.x + (handler.length + 1 + this.radius) / 2
-			) {
-				this.position.z -= Math.sign(this.velocity.z) * diff
-				this.velocity.z *= -1
-
-				const dfc = (-2 * (handler.position.x - collision.x)) / handler.length
-
-				// console.log(dfc)
-				if (Math.abs(dfc) > 0.25) {
-					this.velocity.x += 20 * dfc
-				}
-
-				this.maxSpeed += 0.5
-
-				this.velocity.normalize().multiplyScalar(this.maxSpeed)
-			}
+		if (!real) {
+			this.collisionHandler.position.copy(point)
 		}
+
+		return point
+	}
+
+	getWallCollisionPoint() {
+		const nVel = this.velocity.clone().normalize()
+		const position = this.position.clone()
+		const ray = new Ray(position, nVel)
+		const normal = Math.sign(this.velocity.x)
+
+		const point = new Vector3()
+
+		ray.intersectPlane(
+			new Plane(
+				new Vector3(normal, 0, 0),
+				-grid.resolution.width / 2 + this.radius
+			),
+			point
+		)
+
+		this.collisionMesh.position.copy(point)
+
+		return point
+	}
+
+	checkHandlerCollision(handler, dt, collision, virtualCollision) {
+		const v = this.velocity.clone().multiplyScalar(dt)
+		const position1 = this.position.clone()
+		const position2 = this.position.clone().add(v)
+
+		if (
+			virtualCollision.x <
+				handler.position.x - (handler.length + 1 + this.radius) / 2 ||
+			virtualCollision.x >
+				handler.position.x + (handler.length + 1 + this.radius) / 2 ||
+			Math.abs(position2.z) < Math.abs(collision.z) ||
+			Math.abs(this.position.z) > Math.abs(collision.z)
+		) {
+			return
+		}
+
+		console.log('collide')
+
+		const velToCollision = collision.clone().sub(this.position)
+		const newVel = v.clone().sub(velToCollision)
+		newVel.z *= -1
+
+		this.position.copy(collision.clone().add(newVel))
+
+		this.velocity.z *= -1
+
+		const dfc = (-2 * (handler.position.x - collision.x)) / handler.length
+
+		// console.log(dfc)
+		if (Math.abs(dfc) > 0.25) {
+			this.velocity.x += 20 * dfc
+		}
+
+		this.maxSpeed += 0.5
+
+		this.velocity.normalize().multiplyScalar(this.maxSpeed)
+		// }
+		// }
 	}
 
 	checkBoundaries(position, dt) {
@@ -120,7 +190,7 @@ export default class Ball extends Mesh {
 	}
 
 	initVelocity() {
-		this.maxSpeed = 20
+		this.maxSpeed = 30
 		this.velocity = new Vector3(Math.random() * 0.3 - 0.15, 0, -5)
 			.normalize()
 			.multiplyScalar(this.maxSpeed)

@@ -25,6 +25,8 @@ export class Handler extends Mesh {
 		this.depth = 0.25
 
 		scene.add(this)
+
+		this.geometry.computeBoundingBox()
 	}
 
 	update(cursorX, factor = 0.3) {
@@ -34,5 +36,14 @@ export class Handler extends Mesh {
 			2
 
 		this.position.x = MathUtils.lerp(this.position.x, x, factor)
+	}
+
+	setPosition(x, factor) {
+		const limit = grid.resolution.width / 2 - (this.length + 1) / 2
+		this.position.x = MathUtils.lerp(
+			this.position.x,
+			MathUtils.clamp(x, -limit, limit),
+			factor
+		)
 	}
 }

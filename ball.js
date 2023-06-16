@@ -61,12 +61,12 @@ export default class Ball extends Mesh {
 
 			// console.log(collision, hDirection, v.x, pct)
 
-			const mesh = new Mesh(
-				new SphereGeometry(0.1, 5, 5),
-				new MeshNormalMaterial()
-			)
-			scene.add(mesh)
-			mesh.position.copy(collision)
+			// const mesh = new Mesh(
+			// 	new SphereGeometry(0.1, 5, 5),
+			// 	new MeshNormalMaterial()
+			// )
+			// scene.add(mesh)
+			// mesh.position.copy(collision)
 
 			if (
 				collision.x >

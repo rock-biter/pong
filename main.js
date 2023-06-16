@@ -74,8 +74,10 @@ function animate() {
 	if (ball.position.z <= 10 && ball.velocity.z < 0) {
 		pcHandler.update(
 			ball.position.x / (grid.resolution.width / 2) +
-				noise2D(playerHandler.position.x / 10, 0.1) * 0.1,
-			0.4
+				noise2D(playerHandler.position.x / 10, ball.position.x / 10) *
+					0.2 *
+					(pcHandler.length / (grid.resolution.width / 2)),
+			0.5
 		)
 	}
 

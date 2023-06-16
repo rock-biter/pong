@@ -132,7 +132,7 @@ export default class Ball extends Mesh {
 			virtualCollision.x >
 				handler.position.x + (handler.length + 1 + this.radius) / 2 ||
 			Math.abs(position2.z) < Math.abs(collision.z) ||
-			Math.abs(this.position.z) > Math.abs(virtualCollision.z)
+			Math.abs(this.position.z) > Math.abs(collision.z)
 		) {
 			return
 		}

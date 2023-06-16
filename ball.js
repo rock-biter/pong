@@ -59,18 +59,20 @@ export default class Ball extends Mesh {
 				.copy(this.position)
 				.sub(new Vector3(-hDirection * v.x * pct, 0, -diff))
 
-			console.log(collision, hDirection, v.x, pct)
+			// console.log(collision, hDirection, v.x, pct)
 
-			// const mesh = new Mesh(
-			// 	new SphereGeometry(0.1, 5, 5),
-			// 	new MeshNormalMaterial()
-			// )
-			// scene.add(mesh)
-			// mesh.position.copy(collision)
+			const mesh = new Mesh(
+				new SphereGeometry(0.1, 5, 5),
+				new MeshNormalMaterial()
+			)
+			scene.add(mesh)
+			mesh.position.copy(collision)
 
 			if (
-				collision.x > handler.position.x - (handler.length + 1) / 2 &&
-				collision.x < handler.position.x + (handler.length + 1) / 2
+				collision.x >
+					handler.position.x - (handler.length + 1 + this.radius) / 2 &&
+				collision.x <
+					handler.position.x + (handler.length + 1 + this.radius) / 2
 			) {
 				this.position.z -= Math.sign(this.velocity.z) * diff
 				this.velocity.z *= -1

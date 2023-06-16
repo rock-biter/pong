@@ -95,7 +95,7 @@ window.addEventListener('mousemove', (event) => {
 		Math.min(window.innerWidth * 0.9, 750)
 	cursor.y = 2 * (event.clientY / window.innerHeight) - 1
 
-	console.log(cursor.x)
+	// console.log(cursor.x)
 })
 
 // window.addEventListener('click', animate)

@@ -79,7 +79,7 @@ export default class Ball extends Mesh {
 
 				const dfc = (-2 * (handler.position.x - collision.x)) / handler.length
 
-				console.log(dfc)
+				// console.log(dfc)
 				if (Math.abs(dfc) > 0.25) {
 					this.velocity.x += 20 * dfc
 				}

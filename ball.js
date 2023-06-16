@@ -74,18 +74,18 @@ export default class Ball extends Mesh {
 			) {
 				this.position.z -= Math.sign(this.velocity.z) * diff
 				this.velocity.z *= -1
+
+				const dfc = (-2 * (handler.position.x - collision.x)) / handler.length
+
+				console.log(dfc)
+				if (Math.abs(dfc) > 0.25) {
+					this.velocity.x += 20 * dfc
+				}
+
+				this.maxSpeed += 0.5
+
+				this.velocity.normalize().multiplyScalar(this.maxSpeed)
 			}
-
-			const dfc = (-2 * (handler.position.x - collision.x)) / handler.length
-
-			console.log(dfc)
-			if (Math.abs(dfc) > 0.25) {
-				this.velocity.x += 20 * dfc
-			}
-
-			this.maxSpeed += 0.5
-
-			this.velocity.normalize().multiplyScalar(this.maxSpeed)
 		}
 	}
 

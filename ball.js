@@ -143,10 +143,6 @@ export default class Ball extends Mesh {
 		const newVel = v.clone().sub(velToCollision)
 		newVel.z *= -1
 
-		this.position.copy(collision.clone().add(newVel))
-
-		this.velocity.z *= -1
-
 		const dfc = (-2 * (handler.position.x - collision.x)) / handler.length
 
 		// console.log(dfc)
@@ -157,6 +153,14 @@ export default class Ball extends Mesh {
 		this.maxSpeed += 0.25
 
 		this.velocity.normalize().multiplyScalar(this.maxSpeed)
+
+		this.velocity.z *= -1
+
+		this.position.copy(
+			collision
+				.clone()
+				.add(this.velocity.clone().normalize().multiplyScalar(newVel.length()))
+		)
 		// }
 		// }
 	}

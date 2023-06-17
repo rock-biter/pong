@@ -65,23 +65,26 @@ function onresize() {
 window.addEventListener('resize', onresize)
 
 const clock = new Clock()
+const iteration = 10
 
 function animate() {
 	const deltaTime = clock.getDelta() || 0
 
 	controls.update()
 
-	if (ball.position.z <= 10 && ball.velocity.z < 0) {
-		pcHandler.setPosition(
-			ball.position.x +
-				2.5 * noise2D(ball.position.x / 10, ball.position.x / 10),
-			0.3
-		)
+	for (let i = 0; i < iteration; i++) {
+		if (ball.position.z <= 10 && ball.velocity.z < 0) {
+			pcHandler.setPosition(
+				ball.position.x +
+					2.5 * noise2D(ball.position.x / 10, ball.position.x / 10),
+				0.02
+			)
+		}
+
+		playerHandler.update(cursor.x, 0.03)
+
+		ball.update(deltaTime / iteration, [pcHandler, playerHandler])
 	}
-
-	playerHandler.update(cursor.x)
-
-	ball.update(deltaTime, [pcHandler, playerHandler])
 
 	renderer.render(scene, camera)
 }

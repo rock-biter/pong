@@ -146,8 +146,10 @@ export default class Ball extends Mesh {
 		const dfc = (-2 * (handler.position.x - collision.x)) / handler.length
 
 		// console.log(dfc)
-		if (Math.abs(dfc) > 0.25) {
+		if (Math.abs(dfc) > 0.35) {
 			this.velocity.x += 20 * dfc
+		} else {
+			this.velocity.x *= 0.8
 		}
 
 		this.maxSpeed += 0.25
@@ -194,7 +196,7 @@ export default class Ball extends Mesh {
 	}
 
 	initVelocity() {
-		this.maxSpeed = 30
+		this.maxSpeed = 20
 		this.velocity = new Vector3(Math.random() * 0.3 - 0.15, 0, -5)
 			.normalize()
 			.multiplyScalar(this.maxSpeed)

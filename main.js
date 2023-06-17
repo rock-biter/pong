@@ -65,7 +65,7 @@ function onresize() {
 window.addEventListener('resize', onresize)
 
 const clock = new Clock()
-const iteration = 10
+const iteration = 20
 
 function animate() {
 	const deltaTime = clock.getDelta() || 0
@@ -92,14 +92,23 @@ function animate() {
 renderer.setAnimationLoop(animate)
 // setInterval(animate, 100)
 
-window.addEventListener('mousemove', (event) => {
+window.addEventListener('mousemove', onMouseMove)
+window.addEventListener('touchmove', onMouseMove)
+
+function onMouseMove(event) {
+	console.log(event)
+
+	if (event.touches?.length) {
+		event = event.touches[0]
+	}
+
 	cursor.x =
 		(event.clientX - window.innerWidth / 2) /
 		Math.min(window.innerWidth * 0.9, 750)
 	cursor.y = 2 * (event.clientY / window.innerHeight) - 1
 
 	// console.log(cursor.x)
-})
+}
 
 // window.addEventListener('click', animate)
 

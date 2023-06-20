@@ -40,7 +40,7 @@ const renderer = new WebGLRenderer({ antialias: true })
 document.body.appendChild(renderer.domElement)
 
 const controls = new OrbitControls(camera, renderer.domElement)
-// controls.enableRotate = false
+controls.enableRotate = false
 controls.enablePan = false
 controls.maxDistance = 10 + grid.resolution.height / 2
 controls.minDistance = grid.resolution.height / 3
@@ -82,8 +82,8 @@ function animate() {
 		if (ball.position.z <= 10 && ball.velocity.z < 0) {
 			pcHandler.setPosition(
 				ball.position.x +
-					2.5 * noise2D(ball.position.x / 10, ball.position.x / 10),
-				0.02
+					3 * noise2D(ball.position.x / 10, ball.position.z / 10),
+				0.2 / iteration
 			)
 		}
 

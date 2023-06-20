@@ -40,7 +40,7 @@ const renderer = new WebGLRenderer({ antialias: true })
 document.body.appendChild(renderer.domElement)
 
 const controls = new OrbitControls(camera, renderer.domElement)
-controls.enableRotate = false
+// controls.enableRotate = false
 controls.enablePan = false
 controls.maxDistance = 10 + grid.resolution.height / 2
 controls.minDistance = grid.resolution.height / 3
@@ -65,12 +65,18 @@ function onresize() {
 window.addEventListener('resize', onresize)
 
 const clock = new Clock()
-const iteration = 20
+let iteration = 30
 
 function animate() {
 	const deltaTime = clock.getDelta() || 0
 
 	controls.update()
+
+	if (ball.velocity.length() / iteration >= playerHandler.depth) {
+		iteration++
+	}
+
+	// console.log(iteration)
 
 	for (let i = 0; i < iteration; i++) {
 		if (ball.position.z <= 10 && ball.velocity.z < 0) {
@@ -96,7 +102,7 @@ window.addEventListener('mousemove', onMouseMove)
 window.addEventListener('touchmove', onMouseMove)
 
 function onMouseMove(event) {
-	console.log(event)
+	// console.log(event)
 
 	if (event.touches?.length) {
 		event = event.touches[0]

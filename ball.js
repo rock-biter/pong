@@ -123,27 +123,32 @@ export default class Ball extends Mesh {
 
 	checkHandlerCollision(handler, dt, collision, virtualCollision) {
 		const v = this.velocity.clone().multiplyScalar(dt)
-		const position1 = this.position.clone()
+		// const position1 = this.position.clone()
 		const position2 = this.position.clone().add(v)
+		const rV = v.clone().normalize().multiplyScalar(this.radius)
+
+		// console.log('is inside:', handler.isInside(position2))
 
 		if (
-			Math.max(virtualCollision.x, collision.x) <
-				handler.position.x - (handler.length + 1 + this.radius) / 2 ||
-			Math.min(virtualCollision.x, collision.x) >
-				handler.position.x + (handler.length + 1 + this.radius) / 2 ||
-			Math.abs(position2.z) < Math.abs(collision.z) ||
-			Math.abs(this.position.z) > Math.abs(collision.z)
+			!handler.isInside(position2.add(rV), this.radius)
+			// Math.max(virtualCollision.x, collision.x) <
+			// 	handler.position.x - (handler.length + 1 + this.radius) / 2 ||
+			// Math.min(virtualCollision.x, collision.x) >
+			// 	handler.position.x + (handler.length + 1 + this.radius) / 2 ||
+			// Math.abs(position2.z) < Math.abs(collision.z) ||
+			// Math.abs(this.position.z) > Math.abs(collision.z)
 		) {
 			return
 		}
 
-		console.log('collide')
+		// console.log('collide')
 
-		const velToCollision = collision.clone().sub(this.position)
-		const newVel = v.clone().sub(velToCollision)
-		newVel.z *= -1
+		// const velToCollision = collision.clone().sub(this.position)
+		// const newVel = v.clone().sub(velToCollision)
+		// newVel.z *= -1
+		// v.z *= -1
 
-		const dfc = (-2 * (handler.position.x - collision.x)) / handler.length
+		const dfc = (-2 * (handler.position.x - position2.x)) / (handler.length + 2)
 
 		// console.log(dfc)
 		if (Math.abs(dfc) > 0.35) {
@@ -158,11 +163,13 @@ export default class Ball extends Mesh {
 
 		this.velocity.z *= -1
 
-		this.position.copy(
-			collision
-				.clone()
-				.add(this.velocity.clone().normalize().multiplyScalar(newVel.length()))
-		)
+		this.position.add(this.velocity.clone().multiplyScalar(dt))
+
+		// this.position.copy(
+		// 	collision
+		// 		.clone()
+		// 		.add(this.velocity.clone().normalize().multiplyScalar(newVel.length()))
+		// )
 		// }
 		// }
 	}
